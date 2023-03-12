@@ -28,6 +28,11 @@ By default an admin user is created with credentials:
 * username: admin
 * password: admin
 
+Three user groups are also created:
+* ManagementTeam
+* SalesTeam
+* SupportTeam
+
 ### run the server
 ```
 python manage.py runserver

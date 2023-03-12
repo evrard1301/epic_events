@@ -2,7 +2,7 @@
 
 from django.db import migrations
 from django.contrib.contenttypes.models import ContentType
-from django.contrib.auth import get_user_model
+from crm.models import User
 from django.contrib.auth.models import (
     Permission,
     Group
@@ -10,7 +10,7 @@ from django.contrib.auth.models import (
 
 
 def add_perm(grp, codename):
-    content_type = ContentType.objects.get_for_model(get_user_model())
+    content_type = ContentType.objects.get_for_model(User)
     perm = Permission.objects.create(
         codename=codename,
         name=codename,
@@ -19,10 +19,23 @@ def add_perm(grp, codename):
     grp.permissions.add(perm)
 
 
+def all_perms(grp, name):
+    add_perm(grp, f'add_{name}')
+    add_perm(grp, f'view_{name}')
+    add_perm(grp, f'change_{name}')
+    add_perm(grp, f'delete_{name}')
+
+
 def create_group(_apps, _schema_editor):
     management = Group.objects.create(name='ManagementTeam')
+    management.permissions.set([])
+    all_perms(management, 'user')
+
     sales = Group.objects.create(name='SalesTeam')
+    sales.permissions.set([])
+
     support = Group.objects.create(name='SupportTeam')
+    support.permissions.set([])
 
 
 class Migration(migrations.Migration):

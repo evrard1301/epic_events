@@ -1,9 +1,5 @@
 import pytest
 from fixtures import *
-from django.contrib.auth import get_user_model
-from django.urls import reverse_lazy
-from rest_framework import status
-
 
 @pytest.mark.parametrize('username,password,oracle', [
     ('Alice', 'alicepassword', status.HTTP_401_UNAUTHORIZED),

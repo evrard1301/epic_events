@@ -1,5 +1,5 @@
 from rest_framework.serializers import ModelSerializer
-from crm.models import User
+from crm.models import User, Customer
 
 
 class UserSerializer(ModelSerializer):
@@ -15,3 +15,9 @@ class UserSerializer(ModelSerializer):
         extra_kwargs = {
             'password': {"read_only': True"}
         }
+
+
+class CustomerSerializer(ModelSerializer):
+    class Meta:
+        model = Customer
+        fields = '__all__'

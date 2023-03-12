@@ -1,6 +1,8 @@
 import pytest
-from crm.models import User
+from crm.models import User, Customer, Contract, Event
 from django.contrib.auth.models import Group
+from django.utils import timezone
+
 
 @pytest.fixture
 def noteam_employee(db):
@@ -47,6 +49,13 @@ def sales_employee(db):
 
 
 @pytest.fixture
+def sales_employee__customer(sales_employee, customer):
+    customer.sales_contact=sales_employee
+    customer.save()
+    return sales_employee
+
+
+@pytest.fixture
 def support_employee(db):
     user = User.objects.create(
         first_name='Patt',
@@ -60,3 +69,22 @@ def support_employee(db):
     user.save()
 
     return user
+
+
+@pytest.fixture
+def support_employee__customer(support_employee, customer):
+
+    contract = Contract.objects.create(
+        amount=34.5,
+        customer=customer,
+        payment_due=timezone.now(),
+    )
+
+    Event.objects.create(
+        support_contact=support_employee,
+        contract=contract,
+        attendee=4,
+        event_date=timezone.now(),
+    )
+
+    return support_employee

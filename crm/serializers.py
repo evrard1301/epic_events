@@ -1,5 +1,10 @@
 from rest_framework.serializers import ModelSerializer
-from crm.models import User, Customer, Event
+from crm.models import (
+    User,
+    Customer,
+    Event,
+    Contract
+)
 
 
 class UserSerializer(ModelSerializer):
@@ -26,4 +31,10 @@ class CustomerSerializer(ModelSerializer):
 class EventSerializer(ModelSerializer):
     class Meta:
         model = Event
+        fields = '__all__'
+
+
+class ContractSerializer(ModelSerializer):
+    class Meta:
+        model = Contract
         fields = '__all__'

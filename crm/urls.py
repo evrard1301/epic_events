@@ -13,6 +13,7 @@ router = SimpleRouter()
 router.register('users', views.UserViewSet, basename='users')
 router.register('customers', views.CustomerViewSet, basename='customers')
 router.register('events', views.EventViewSet, basename='events')
+router.register('contracts', views.ContractViewSet, basename='contracts')
 
 urlpatterns = [
     path('login/', TokenObtainPairView.as_view(), name='login'),

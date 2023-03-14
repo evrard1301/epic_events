@@ -122,6 +122,10 @@ def sales_customers(request, customer):
     return request.user == customer.sales_contact
 
 
+def sales_contracts(request, contract):
+    return request.user == contract.sales_contact
+
+
 class CustomerPermission(ModelPermission):
     class Meta:
         model = models.Customer
@@ -157,3 +161,16 @@ class EventPermission(ModelPermission):
             GroupRule('SalesTeam').create()
         ]
 
+
+class ContractPermission(ModelPermission):
+    class Meta:
+        model = models.Contract
+        rules = [
+            GroupRule('ManagementTeam').crud(),
+
+            GroupRule('SalesTeam')
+            .for_object(sales_contracts)
+            .list()
+            .retrieve()
+            .update()
+        ]

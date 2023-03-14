@@ -69,7 +69,6 @@ def test_customers_retrieve(client, customer, request, employee_str, oracle):
     ('sales_employee', status.HTTP_403_FORBIDDEN),
     ('sales_employee__customer', status.HTTP_200_OK),
     ('support_employee', status.HTTP_403_FORBIDDEN),
-    ('support_employee__customer', status.HTTP_200_OK),
 ])
 def test_customers_update(client, customer, request, employee_str, oracle):
     my_employee = request.getfixturevalue(employee_str)
@@ -94,7 +93,6 @@ def test_customers_update(client, customer, request, employee_str, oracle):
     ('sales_employee', status.HTTP_403_FORBIDDEN),
     ('sales_employee__customer', status.HTTP_204_NO_CONTENT),
     ('support_employee', status.HTTP_403_FORBIDDEN),
-    ('support_employee__customer', status.HTTP_204_NO_CONTENT),
 ])
 def test_customers_delete(client, customer, request, employee_str, oracle):
     my_employee = request.getfixturevalue(employee_str)

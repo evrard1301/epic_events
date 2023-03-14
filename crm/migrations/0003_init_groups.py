@@ -31,14 +31,22 @@ def create_group(_apps, _schema_editor):
         management = Group.objects.create(name='ManagementTeam')
         management.permissions.set([])
         all_perms(management, 'user')
+        all_perms(management, 'event')
         all_perms(management, 'customer')
+        all_perms(management, 'contract')
 
         sales = Group.objects.create(name='SalesTeam')
         sales.permissions.set([])
-        add_perm(sales, 'add_customer')
+        all_perms(sales, 'customer')
+        all_perms(sales, 'contract')
+        add_perm(sales, 'add_event')
 
         support = Group.objects.create(name='SupportTeam')
         support.permissions.set([])
+        add_perm(support, 'view_customer')
+        add_perm(support, 'view_event')
+        add_perm(support, 'change_event')
+        add_perm(support, 'delete_event')
 
 
 class Migration(migrations.Migration):

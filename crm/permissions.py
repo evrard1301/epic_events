@@ -3,6 +3,12 @@ from crm import models
 from rest_framework import permissions as rest_permissions
 
 
+class Perm:
+    def __init__(self, action, scope):
+        self.action = action
+        self.scope = scope
+
+
 class ModelPermission(rest_permissions.BasePermission):
     def __init__(self):
         pass
@@ -35,16 +41,17 @@ class ModelPermission(rest_permissions.BasePermission):
 
         actions = []
         for rule in rules:
-            actions += rule.actions
+            actions += [p.action for p in rule.actions]
 
         if view.action not in actions:
             return False
 
         for rule in rules:
-            for action in rule.actions:
-                perm = self._gen_perm(action)
+            for permission in rule.actions:
+                perm = self._gen_perm(permission.action)
                 if not user.has_perm(perm):
                     return False
+
         return True
 
     def has_object_permission(self, request, view, obj):
@@ -60,8 +67,12 @@ class ModelPermission(rest_permissions.BasePermission):
             return False
 
         for rule in rules:
-            if rule.object and not rule.object(request, obj):
-                return False
+
+            for perm in rule.actions:
+                if perm.action != view.action:
+                    continue
+                if perm.scope and not perm.scope(request, obj):
+                    return False
 
         return True
 
@@ -70,36 +81,37 @@ class GroupRule:
     def __init__(self, group_name):
         self.group = group_name
         self.actions = []
-        self.object = None
 
     def for_object(self, obj):
-        self.object = obj
         return self
 
     def read_only(self):
         return self.list().retrieve()
 
-    def crud(self):
-        return self.read_only().create().update().destroy()
+    def crud(self, scope=None):
+        return self.read_only().alter(scope)
 
-    def list(self):
-        self.actions.append('list')
+    def alter(self, scope=None):
+        return self.create(scope).update(scope).destroy(scope)
+
+    def list(self, scope=None):
+        self.actions.append(Perm('list', scope))
         return self
 
-    def retrieve(self):
-        self.actions.append('retrieve')
+    def retrieve(self, scope=None):
+        self.actions.append(Perm('retrieve', scope))
         return self
 
-    def create(self):
-        self.actions.append('create')
+    def create(self, scope=None):
+        self.actions.append(Perm('create', scope))
         return self
 
-    def update(self):
-        self.actions.append('update')
+    def update(self, scope=None):
+        self.actions.append(Perm('update', scope))
         return self
 
-    def destroy(self):
-        self.actions.append('destroy')
+    def destroy(self, scope=None):
+        self.actions.append(Perm('destroy', scope))
         return self
 
 
@@ -126,6 +138,10 @@ def sales_contracts(request, contract):
     return request.user == contract.sales_contact
 
 
+def sales_events(request, event):
+    return event.contract.customer.sales_contact == request.user
+
+
 class CustomerPermission(ModelPermission):
     class Meta:
         model = models.Customer
@@ -133,8 +149,8 @@ class CustomerPermission(ModelPermission):
             GroupRule('ManagementTeam').crud(),
 
             GroupRule('SalesTeam')
-            .for_object(sales_customers)
-            .crud(),
+            .read_only()
+            .alter(sales_customers),
 
             GroupRule('SupportTeam')
             .for_object(support_customers)
@@ -152,13 +168,13 @@ class EventPermission(ModelPermission):
         rules = [
             GroupRule('ManagementTeam').crud(),
 
-            GroupRule('SupportTeam')
-            .for_object(support_events)
-            .list()
-            .retrieve()
-            .update(),
+            GroupRule('SalesTeam')
+            .crud(sales_events),
 
-            GroupRule('SalesTeam').create()
+            GroupRule('SupportTeam')
+            .read_only()
+            .update(support_events)
+            .destroy(support_events)
         ]
 
 
@@ -168,9 +184,7 @@ class ContractPermission(ModelPermission):
         rules = [
             GroupRule('ManagementTeam').crud(),
 
-            GroupRule('SalesTeam')
-            .for_object(sales_contracts)
-            .list()
-            .retrieve()
-            .update()
+            GroupRule('SalesTeam').crud(sales_contracts),
+
+            GroupRule('SupportTeam').read_only()
         ]

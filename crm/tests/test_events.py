@@ -18,13 +18,13 @@ def quick_event(contact=None):
     return obj
 
 
-@pytest.mark.parametrize('employee_str,oracle,count', [
-    ('management_employee', status.HTTP_200_OK, 5),
-    ('sales_employee', status.HTTP_403_FORBIDDEN, 0),
-    ('support_employee', status.HTTP_200_OK, 0),
-    ('support_employee__customer', status.HTTP_200_OK, 2),
+@pytest.mark.parametrize('employee_str,oracle', [
+    ('management_employee', status.HTTP_200_OK),
+    ('sales_employee', status.HTTP_200_OK),
+    ('support_employee', status.HTTP_200_OK),
+    ('support_employee__customer', status.HTTP_200_OK),
 ])
-def test_event_list(client, request, employee_str, oracle, count):
+def test_event_list(client, request, employee_str, oracle):
     my_employee = request.getfixturevalue(employee_str)
     client.force_login(my_employee)
 
@@ -43,14 +43,12 @@ def test_event_list(client, request, employee_str, oracle, count):
     res = client.get(reverse_lazy('crm:events-list'))
 
     assert oracle == res.status_code
-    assert res.status_code != status.HTTP_200_OK \
-           or count == len(res.data) - before_count
 
 
 @pytest.mark.parametrize('employee_str,own,oracle', [
     ('management_employee', False, status.HTTP_200_OK),
-    ('sales_employee', False, status.HTTP_403_FORBIDDEN),
-    ('support_employee', False, status.HTTP_403_FORBIDDEN),
+    ('sales_employee', False, status.HTTP_200_OK),
+    ('support_employee', False, status.HTTP_200_OK),
     ('support_employee', True, status.HTTP_200_OK),
 ])
 def test_event_retrieve(client, request, employee_str, own, oracle):
@@ -82,9 +80,13 @@ def test_event_create(client, request, contract, employee_str, oracle):
         'contract': contract.id
     })
 
+    assert oracle == res.status_code
+
+
 @pytest.mark.parametrize('employee_str,own,oracle', [
     ('management_employee', False, status.HTTP_200_OK),
     ('sales_employee', False, status.HTTP_403_FORBIDDEN),
+    ('sales_employee', True, status.HTTP_200_OK),
     ('support_employee', False, status.HTTP_403_FORBIDDEN),
     ('support_employee', True, status.HTTP_200_OK),
 ])
@@ -95,7 +97,12 @@ def test_event_update(client, event,
     client.force_login(my_employee)
 
     if own:
-        event.support_contact = my_employee
+        if 'sales' in employee_str:
+            event.contract.customer.sales_contact = my_employee
+            event.contract.customer.save()
+
+        if 'support' in employee_str:
+            event.support_contact = my_employee
         event.save()
 
     res = client.put(reverse_lazy('crm:events-detail', kwargs={
@@ -110,15 +117,27 @@ def test_event_update(client, event,
     assert oracle == res.status_code
 
 
-@pytest.mark.parametrize('employee_str,oracle', [
-    ('management_employee', status.HTTP_204_NO_CONTENT),
-    ('sales_employee', status.HTTP_403_FORBIDDEN),
-    ('support_employee', status.HTTP_403_FORBIDDEN),
+@pytest.mark.parametrize('employee_str,own,oracle', [
+    ('management_employee', False, status.HTTP_204_NO_CONTENT),
+    ('sales_employee', False, status.HTTP_403_FORBIDDEN),
+    ('sales_employee', True, status.HTTP_204_NO_CONTENT),
+    ('support_employee', False, status.HTTP_403_FORBIDDEN),
+    ('support_employee', True, status.HTTP_204_NO_CONTENT),
 ])
 def test_event_destroy(client, event,
-                      request, employee_str, oracle):
+                       request, employee_str, own, oracle):
     my_employee = request.getfixturevalue(employee_str)
     client.force_login(my_employee)
+
+    if own:
+        if 'sales' in employee_str:
+            event.contract.customer.sales_contact = my_employee
+            event.contract.customer.save()
+
+        if 'support' in employee_str:
+            event.support_contact = my_employee
+
+        event.save()
 
     res = client.delete(reverse_lazy('crm:events-detail', kwargs={
         'pk': event.id

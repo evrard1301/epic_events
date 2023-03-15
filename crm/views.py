@@ -36,16 +36,12 @@ class CustomerViewSet(ModelViewSet):
 
     def get_queryset(self):
         customers = Customer.objects.all()
-
         if self.action == 'list':
             name_filter = self.request.GET.get('name', None)
             customers = customers.filter(last_name=name_filter) if name_filter is not None else customers
 
             email_filter = self.request.GET.get('email', None)
             customers = customers.filter(email=email_filter) if email_filter is not None else customers
-
-        if self.action == 'list' and not self.request.user.is_in_group('ManagementTeam'):
-            customers = customers.filter(sales_contact=self.request.user.id)
 
         return customers
 
@@ -72,9 +68,6 @@ class EventViewSet(ModelViewSet):
                 event_date__month = date_components[1],
                 event_date__year = date_components[2]
             ) if date_components is not None else events
-
-        if self.action == 'list' and not self.request.user.is_in_group('ManagementTeam'):
-            return events.filter(support_contact=self.request.user.id)
 
         return events
 

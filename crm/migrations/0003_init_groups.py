@@ -19,31 +19,37 @@ def add_perm(grp, codename):
     grp.permissions.add(perm)
 
 
-def all_perms(grp, name):
+def crud(grp, name):
     add_perm(grp, f'add_{name}')
     add_perm(grp, f'view_{name}')
     add_perm(grp, f'change_{name}')
     add_perm(grp, f'delete_{name}')
 
 
+def read_only(grp, name):
+    add_perm(grp, f'view_{name}')
+
+
 def create_group(_apps, _schema_editor):
     with transaction.atomic():
         management = Group.objects.create(name='ManagementTeam')
         management.permissions.set([])
-        all_perms(management, 'user')
-        all_perms(management, 'event')
-        all_perms(management, 'customer')
-        all_perms(management, 'contract')
+        crud(management, 'user')
+        crud(management, 'event')
+        crud(management, 'customer')
+        crud(management, 'contract')
 
         sales = Group.objects.create(name='SalesTeam')
         sales.permissions.set([])
-        all_perms(sales, 'customer')
-        all_perms(sales, 'contract')
-        add_perm(sales, 'add_event')
+        crud(sales, 'customer')
+        crud(sales, 'contract')
+        crud(sales, 'event')
 
         support = Group.objects.create(name='SupportTeam')
         support.permissions.set([])
-        add_perm(support, 'view_customer')
+        read_only(support, 'customer')
+        read_only(support, 'contract')
+
         add_perm(support, 'view_event')
         add_perm(support, 'change_event')
         add_perm(support, 'delete_event')

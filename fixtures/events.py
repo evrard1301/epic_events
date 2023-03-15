@@ -1,5 +1,5 @@
 import pytest
-from crm.models import Event, Contract
+from crm.models import Event, Contract, Customer
 from django.utils import timezone
 import datetime
 
@@ -9,7 +9,14 @@ def event(contract):
     return Event.objects.create(
         attendee=4,
         event_date=timezone.now(),
-        contract=contract
+        contract=Contract.objects.create(
+            amount=7.2,
+            payment_due=timezone.now(),
+            customer=Customer.objects.create(
+                first_name='Mick',
+                last_name='Codeur'
+            )
+        ),
     )
 
 

@@ -1,5 +1,5 @@
 import pytest
-from crm.models import Contract
+from crm.models import Contract, Customer
 from django.utils import timezone
 import datetime
 
@@ -9,6 +9,7 @@ def contract(db):
     return Contract.objects.create(
         amount=7.2,
         payment_due=timezone.now(),
+        customer=Customer.objects.create(first_name='Conrad', last_name='Crises')
     )
 
 

@@ -56,8 +56,7 @@ def sales_employee__customer(sales_employee, customer):
     Contract.objects.create(
         amount=34.5,
         customer=customer,
-        payment_due=timezone.now(),
-        sales_contact=sales_employee
+        payment_due=timezone.now()
     )
 
     return sales_employee

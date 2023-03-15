@@ -135,7 +135,7 @@ def sales_customers(request, customer):
 
 
 def sales_contracts(request, contract):
-    return request.user == contract.sales_contact
+    return request.user == contract.customer.sales_contact
 
 
 def sales_events(request, event):

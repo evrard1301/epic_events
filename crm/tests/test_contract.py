@@ -15,12 +15,10 @@ def test_contracts_list(client, request, employee_str, own, oracle):
     Contract.objects.create(amount=0.0, payment_due=timezone.now())
 
     if own:
-        Contract.objects.create(amount=0.0, payment_due=timezone.now(),
-                                sales_contact=my_employee)
-        Contract.objects.create(amount=0.0, payment_due=timezone.now(),
-                                sales_contact=my_employee)
-        Contract.objects.create(amount=0.0, payment_due=timezone.now(),
-                                sales_contact=my_employee)
+        for i in range(0, 3):
+            c = Contract.objects.create(amount=0.0, payment_due=timezone.now())
+            c.customer = Customer.objects.create(last_name='Lebowski', sales_contact=my_employee)
+            c.customer.save()
 
     Contract.objects.create(amount=0.0, payment_due=timezone.now())
     Contract.objects.create(amount=0.0, payment_due=timezone.now())
@@ -42,8 +40,8 @@ def test_contracts_retrieve(client, contract,
     client.force_login(my_employee)
 
     if own:
-        contract.sales_contact = my_employee
-        contract.save()
+        contract.customer.sales_contact = my_employee
+        contract.customer.save()
 
     res = client.get(reverse_lazy('crm:contracts-detail', kwargs={
         'pk': contract.id
@@ -81,8 +79,8 @@ def test_contracts_update(client, contract,
     client.force_login(my_employee)
 
     if own:
-        contract.sales_contact = my_employee
-        contract.save()
+        contract.customer.sales_contact = my_employee
+        contract.customer.save()
 
     res = client.put(reverse_lazy('crm:contracts-detail', kwargs={
         'pk': contract.id
@@ -106,8 +104,8 @@ def test_contracts_destroy(client, contract,
     client.force_login(my_employee)
 
     if own:
-        contract.sales_contact = my_employee
-        contract.save()
+        contract.customer.sales_contact = my_employee
+        contract.customer.save()
 
     res = client.delete(reverse_lazy('crm:contracts-detail', kwargs={
         'pk': contract.id

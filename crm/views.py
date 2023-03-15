@@ -95,7 +95,5 @@ class ContractViewSet(ModelViewSet):
             amount_filter = self.request.GET.get('amount', None)
             contracts = contracts if amount_filter is None else contracts.filter(amount=amount_filter)
 
-        if self.action == 'list' and not self.request.user.is_in_group('ManagementTeam'):
-            return contracts.filter(sales_contact=self.request.user.id)
 
         return contracts

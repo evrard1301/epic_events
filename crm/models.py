@@ -46,12 +46,6 @@ class Contract(models.Model):
     date_updated = models.DateTimeField(auto_now=True)
     payment_due = models.DateTimeField()
     customer = models.ForeignKey(Customer, on_delete=models.SET_NULL, null=True)
-    sales_contact = models.ForeignKey(
-        User,
-        on_delete=models.SET_NULL,
-        null=True,
-        validators=[is_sales_validator]
-    )
 
 
 class EventStatus(models.Model):

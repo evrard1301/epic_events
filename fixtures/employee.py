@@ -1,5 +1,5 @@
 import pytest
-from crm.models import User, Customer, Contract, Event
+from crm.models import User, Contract, Event
 from django.contrib.auth.models import Group
 from django.utils import timezone
 
@@ -50,7 +50,7 @@ def sales_employee(db):
 
 @pytest.fixture
 def sales_employee__customer(sales_employee, customer):
-    customer.sales_contact=sales_employee
+    customer.sales_contact = sales_employee
     customer.save()
     return sales_employee
 

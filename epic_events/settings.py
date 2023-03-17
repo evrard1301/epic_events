@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'drf_api_logger',
     'rest_framework_simplejwt',
     'rest_framework',
     'django_filters',
@@ -53,6 +54,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'drf_api_logger.middleware.api_logger_middleware.APILoggerMiddleware'
 ]
 
 ROOT_URLCONF = 'epic_events.urls'
@@ -146,3 +148,4 @@ REST_FRAMEWORK = {
 }
 
 AUTH_USER_MODEL = 'crm.User'
+DRF_API_LOGGER_DATABASE = True

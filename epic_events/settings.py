@@ -84,9 +84,9 @@ WSGI_APPLICATION = 'epic_events.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'ocr12',
-        'USER': 'ocr12',
-        'PASSWORD': 'ocr12'
+        'NAME': os.getenv('OCR_DB_NAME', 'ocr12'),
+        'USER': os.getenv('OCR_DB_USER', 'ocr12'),
+        'PASSWORD': os.getenv('OCR_DB_PASSWORD', 'ocr12')
     }
 }
 

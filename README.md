@@ -18,7 +18,16 @@ pip install -r requirements.txt
 ```
 pytest
 ```
+### create db
+Epic Events generates those default credentials: 
+* database: ``ocr12``
+* user: ``ocr12``
+* password: ``ocr12``
 
+You can overwrite those credentials via the environment variables:
+* ``OCR_DB_NAME``
+* ``OCR_DB_USER``
+* ``OCR_DB_PASSWORD``
 ### initialize db
 ```
 python manage.py migrate

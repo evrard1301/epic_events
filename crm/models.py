@@ -38,6 +38,9 @@ class Customer(models.Model):
 class ContractStatus(models.Model):
     name = models.CharField(max_length=256)
 
+    class Meta:
+        verbose_name_plural = 'Contract status'
+
 
 class Contract(models.Model):
     amount = models.FloatField()
@@ -50,6 +53,9 @@ class Contract(models.Model):
 
 class EventStatus(models.Model):
     name = models.CharField(max_length=256)
+
+    class Meta:
+        verbose_name_plural = 'Event status'
 
 
 class Event(models.Model):

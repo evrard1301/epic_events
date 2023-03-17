@@ -1,7 +1,9 @@
 from rest_framework.viewsets import ModelViewSet
-from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.response import Response
+from rest_framework.decorators import action
+from django.contrib.auth.models import Group
+from django.shortcuts import get_object_or_404
 from crm import filters
-import datetime
 
 
 from crm.models import (
@@ -30,6 +32,15 @@ class UserViewSet(ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes = [UserPermission]
+
+    @action(detail=True, methods=['post'], name='grant')
+    def grant(self, request, pk):
+        user = get_object_or_404(User, pk=pk)
+        grp = Group.objects.get(name=request.POST.get('group'))
+        grp.user_set.add(user)
+        grp.save()
+        user.save()
+        return Response()
 
 
 class CustomerViewSet(ModelViewSet):

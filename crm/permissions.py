@@ -19,7 +19,8 @@ class ModelPermission(rest_permissions.BasePermission):
             'retrieve': 'view',
             'create': 'add',
             'update': 'change',
-            'destroy': 'delete'
+            'destroy': 'delete',
+            'grant': 'grant'
         }[action]
 
         model = self.Meta().model
@@ -56,7 +57,6 @@ class ModelPermission(rest_permissions.BasePermission):
 
     def has_object_permission(self, request, view, obj):
         user = request.user
-
         rules = [
             rule
             for rule in self.Meta.rules
@@ -114,12 +114,16 @@ class GroupRule:
         self.actions.append(Perm('destroy', scope))
         return self
 
+    def action(self, name, scope=None):
+        self.actions.append(Perm(name, scope))
+        return self
+
 
 class UserPermission(ModelPermission):
     class Meta:
         model = models.User
         rules = [
-            GroupRule('ManagementTeam').crud()
+            GroupRule('ManagementTeam').crud().action('grant')
         ]
 
 

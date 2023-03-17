@@ -3,6 +3,7 @@
 from django.db import migrations, transaction
 from django.contrib.contenttypes.models import ContentType
 from crm.models import User
+from django.contrib.auth import get_user_model
 from django.contrib.auth.models import (
     Permission,
     Group
@@ -53,6 +54,8 @@ def create_group(_apps, _schema_editor):
         add_perm(support, 'view_event')
         add_perm(support, 'change_event')
         add_perm(support, 'delete_event')
+
+        management.user_set.add(get_user_model().objects.get(username="admin"))
 
 
 class Migration(migrations.Migration):

@@ -5,8 +5,7 @@ from django.contrib.auth import get_user_model
 
 
 def create(_apps, _schemas_editor):
-    get_user_model().objects.create_user(
-        is_superuser=True,
+    get_user_model().objects.create_superuser(
         is_staff=True,
         username='admin',
         password='admin'

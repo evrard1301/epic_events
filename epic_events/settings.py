@@ -149,3 +149,12 @@ REST_FRAMEWORK = {
 
 AUTH_USER_MODEL = 'crm.User'
 DRF_API_LOGGER_DATABASE = True
+
+CSRF_TRUSTED_ORIGINS = [
+    'http://127.0.0.1'
+]
+
+ALLOWED_HOSTS = [
+    '127.0.0.1',
+    'localhost'
+]

@@ -10,7 +10,8 @@ from crm.models import (
     User,
     Customer,
     Event,
-    Contract
+    Contract,
+    ContractStatus
 )
 
 from crm.serializers import (
@@ -36,6 +37,7 @@ class UserViewSet(ModelViewSet):
     @action(detail=True, methods=['post'], name='grant')
     def grant(self, request, pk):
         user = get_object_or_404(User, pk=pk)
+        self.check_object_permissions(request, user)
         user.groups.clear()
         grp = Group.objects.get(name=request.POST.get('group'))
         grp.user_set.add(user)
@@ -63,3 +65,16 @@ class ContractViewSet(ModelViewSet):
     permission_classes = [ContractPermission]
     queryset = Contract.objects.all()
     filterset_class = filters.ContractFilter
+
+    @action(detail=True, methods=['post'], name='sign')
+    def sign(self, request, pk):
+        contract = get_object_or_404(Contract, pk=pk)
+        self.check_object_permissions(request, contract)
+
+        contract.status = ContractStatus.objects.create(
+            name='signed'
+        )
+
+        contract.save()
+
+        return Response()

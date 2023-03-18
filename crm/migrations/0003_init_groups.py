@@ -35,6 +35,7 @@ def create_group(_apps, _schema_editor):
     with transaction.atomic():
         management = Group.objects.create(name='ManagementTeam')
         management.permissions.set([])
+        add_perm(management, 'sign_contract')
         add_perm(management, 'grant_user')
         crud(management, 'user')
         crud(management, 'event')
@@ -43,6 +44,7 @@ def create_group(_apps, _schema_editor):
 
         sales = Group.objects.create(name='SalesTeam')
         sales.permissions.set([])
+        add_perm(sales, 'sign_contract')
         crud(sales, 'customer')
         crud(sales, 'contract')
         crud(sales, 'event')

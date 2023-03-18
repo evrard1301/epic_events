@@ -112,3 +112,30 @@ def test_contracts_destroy(client, contract,
     }))
 
     assert oracle == res.status_code
+
+
+@pytest.mark.parametrize('employee_str,own,oracle', [
+    ('management_employee', False, status.HTTP_200_OK),
+    ('sales_employee', False, status.HTTP_403_FORBIDDEN),
+    ('sales_employee', True, status.HTTP_200_OK),
+    ('support_employee', False, status.HTTP_403_FORBIDDEN),
+])
+def test_contracts_sign(client, contract,
+                        request, employee_str, own, oracle):
+    my_employee = request.getfixturevalue(employee_str)
+    client.force_login(my_employee)
+
+    if own:
+        contract.customer.sales_contact = my_employee
+        contract.customer.save()
+
+    res = client.post(reverse_lazy('crm:contracts-sign', kwargs={
+        'pk': contract.id
+    }))
+
+    assert oracle == res.status_code
+
+    if res.status_code == status.HTTP_200_OK:
+        contract.refresh_from_db()
+        assert contract.status is not None
+        assert 'signed' == contract.status.name

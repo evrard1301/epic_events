@@ -20,7 +20,8 @@ class ModelPermission(rest_permissions.BasePermission):
             'create': 'add',
             'update': 'change',
             'destroy': 'delete',
-            'grant': 'grant'
+            'grant': 'grant',
+            'sign': 'sign'
         }[action]
 
         model = self.Meta().model
@@ -67,10 +68,10 @@ class ModelPermission(rest_permissions.BasePermission):
             return False
 
         for rule in rules:
-
             for perm in rule.actions:
                 if perm.action != view.action:
                     continue
+
                 if perm.scope and not perm.scope(request, obj):
                     return False
 
@@ -186,9 +187,10 @@ class ContractPermission(ModelPermission):
     class Meta:
         model = models.Contract
         rules = [
-            GroupRule('ManagementTeam').crud(),
+            GroupRule('ManagementTeam').crud().action('sign'),
 
-            GroupRule('SalesTeam').crud(sales_contracts),
+            GroupRule('SalesTeam').crud(sales_contracts)
+                                  .action('sign', sales_contracts),
 
             GroupRule('SupportTeam').read_only()
         ]

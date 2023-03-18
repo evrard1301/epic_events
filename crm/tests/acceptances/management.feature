@@ -25,5 +25,3 @@ Feature: As management team member, I can administrate the system.
     When I create its user account.
     And I change its group to SalesTeam.
     Then The user is in the group "SalesTeam".
-
-

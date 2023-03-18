@@ -65,7 +65,8 @@ def test_users_update(client, request, employee_str, oracle):
         'pk': user.id
     }), {
         'username': 'maxime',
-        'email': 'maxime.moulin@email.com'
+        'email': 'maxime.moulin@email.com',
+        'password': 'maximepasswd'
     })
 
     assert oracle == res.status_code

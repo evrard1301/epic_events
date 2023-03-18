@@ -36,6 +36,7 @@ class UserViewSet(ModelViewSet):
     @action(detail=True, methods=['post'], name='grant')
     def grant(self, request, pk):
         user = get_object_or_404(User, pk=pk)
+        user.groups.clear()
         grp = Group.objects.get(name=request.POST.get('group'))
         grp.user_set.add(user)
         grp.save()

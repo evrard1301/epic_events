@@ -15,11 +15,21 @@ class UserSerializer(ModelSerializer):
             'email',
             'username',
             'first_name',
-            'last_name'
+            'last_name',
+            'password'
         ]
         extra_kwargs = {
-            'password': {"read_only': True"}
+            'password': {"write_only": True}
         }
+
+    def create(self, validated_data):
+        return User.objects.create_user(**validated_data)
+
+    def update(self, instance, validated_data):
+        User.objects.filter(pk=instance.id).update(**validated_data)
+        instance.set_password(instance.password)
+        instance.save()
+        return instance
 
 
 class CustomerSerializer(ModelSerializer):

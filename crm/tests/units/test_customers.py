@@ -49,7 +49,8 @@ def test_customers_retrieve(client, customer, request, employee_str, oracle):
     ('sales_employee', status.HTTP_201_CREATED),
     ('support_employee', status.HTTP_403_FORBIDDEN),
 ])
-def test_customers_create(client, request, employee_str, oracle):
+def test_customers_create(client, sales_employee2,
+                          request, employee_str, oracle):
     my_employee = request.getfixturevalue(employee_str)
     client.force_login(my_employee)
     res = client.post(reverse_lazy('crm:customers-list'), {
@@ -58,7 +59,8 @@ def test_customers_create(client, request, employee_str, oracle):
         'email': 'jjohnson@email.com',
         'phone': '000-000-000',
         'mobile': '000-000-000',
-        'company': 'JackInc'
+        'company': 'JackInc',
+        'sales_contact': sales_employee2.id
     })
 
     assert oracle == res.status_code
@@ -82,7 +84,8 @@ def test_customers_update(client, customer, request, employee_str, oracle):
         'email': 'kkokon@email.com',
         'phone': '000-000-000',
         'mobile': '000-000-000',
-        'company': 'KokonInc'
+        'company': 'KokonInc',
+        'sales_contact': customer.sales_contact.id
     })
 
     assert oracle == res.status_code

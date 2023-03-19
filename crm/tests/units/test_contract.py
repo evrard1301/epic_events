@@ -7,21 +7,46 @@ from fixtures import *
     ('sales_employee', True, status.HTTP_200_OK),
     ('support_employee', False, status.HTTP_200_OK),
 ])
-def test_contracts_list(client, request, employee_str, own, oracle):
+def test_contracts_list(client, request, customer, employee_str, own, oracle):
     my_employee = request.getfixturevalue(employee_str)
     client.force_login(my_employee)
 
-    Contract.objects.create(amount=0.0, payment_due=timezone.now())
-    Contract.objects.create(amount=0.0, payment_due=timezone.now())
+    Contract.objects.create(
+        amount=0.0,
+        payment_due=timezone.now(),
+        customer=customer
+    )
+
+    Contract.objects.create(
+        amount=0.0,
+        payment_due=timezone.now(),
+        customer=customer
+    )
 
     if own:
         for i in range(0, 3):
-            c = Contract.objects.create(amount=0.0, payment_due=timezone.now())
-            c.customer = Customer.objects.create(last_name='Lebowski', sales_contact=my_employee)
+            c = Contract.objects.create(
+                amount=0.0,
+                payment_due=timezone.now(),
+                customer=customer
+            )
+            c.customer = Customer.objects.create(
+                last_name='Lebowski',
+                sales_contact=my_employee,
+            )
             c.customer.save()
 
-    Contract.objects.create(amount=0.0, payment_due=timezone.now())
-    Contract.objects.create(amount=0.0, payment_due=timezone.now())
+    Contract.objects.create(
+        amount=0.0,
+        payment_due=timezone.now(),
+        customer=customer
+    )
+
+    Contract.objects.create(
+        amount=0.0,
+        payment_due=timezone.now(),
+        customer=customer
+    )
 
     res = client.get(reverse_lazy('crm:contracts-list'))
 
@@ -55,13 +80,14 @@ def test_contracts_retrieve(client, contract,
     ('sales_employee', status.HTTP_201_CREATED),
     ('support_employee', status.HTTP_403_FORBIDDEN),
 ])
-def test_contracts_create(client, request, employee_str, oracle):
+def test_contracts_create(client, customer, request, employee_str, oracle):
     my_employee = request.getfixturevalue(employee_str)
     client.force_login(my_employee)
 
     res = client.post(reverse_lazy('crm:contracts-list'), {
         'amount': 0.0,
-        'payment_due': timezone.now()
+        'payment_due': timezone.now(),
+        'customer': customer.id
     })
 
     assert oracle == res.status_code
@@ -86,7 +112,8 @@ def test_contracts_update(client, contract,
         'pk': contract.id
     }), {
         'amount': 0.0,
-        'payment_due': timezone.now()
+        'payment_due': timezone.now(),
+        'customer': contract.customer.id
     })
 
     assert oracle == res.status_code

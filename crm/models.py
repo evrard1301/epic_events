@@ -29,8 +29,7 @@ class Customer(models.Model):
     date_updated = models.DateTimeField(auto_now=True)
     sales_contact = models.ForeignKey(
         User,
-        on_delete=models.SET_NULL,
-        null=True,
+        on_delete=models.CASCADE,
         validators=[is_sales_validator]
     )
 
@@ -48,7 +47,7 @@ class Contract(models.Model):
     date_created = models.DateTimeField(auto_now_add=True)
     date_updated = models.DateTimeField(auto_now=True)
     payment_due = models.DateTimeField()
-    customer = models.ForeignKey(Customer, on_delete=models.SET_NULL, null=True)
+    customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
 
 
 class EventStatus(models.Model):
@@ -67,8 +66,7 @@ class Event(models.Model):
     status = models.ForeignKey(EventStatus, on_delete=models.SET_NULL, null=True)
     support_contact = models.ForeignKey(
         User,
-        on_delete=models.SET_NULL,
-        null=True,
+        on_delete=models.CASCADE,
         validators=[is_support_validator]
     )
 

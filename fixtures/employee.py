@@ -49,6 +49,22 @@ def sales_employee(db):
 
 
 @pytest.fixture
+def sales_employee2(db):
+    user = User.objects.create(
+        first_name='Mao',
+        last_name='Zicmu',
+        email='mao.tzicmu@email.com',
+        username='mzicmu'
+    )
+
+    group = Group.objects.get(name='SalesTeam')
+    user.groups.add(group)
+    user.save()
+
+    return user
+
+
+@pytest.fixture
 def sales_employee__customer(sales_employee, customer):
     customer.sales_contact = sales_employee
     customer.save()
@@ -77,6 +93,21 @@ def support_employee(db):
 
     return user
 
+
+@pytest.fixture
+def support_employee2(db):
+    user = User.objects.create(
+        first_name='Bernard',
+        last_name='Botele',
+        email='bernard.botole@email.com',
+        username='bbotele'
+    )
+
+    group = Group.objects.get(name='SupportTeam')
+    user.groups.add(group)
+    user.save()
+
+    return user
 
 @pytest.fixture
 def support_employee__customer(support_employee, customer):

@@ -52,6 +52,8 @@ class ModelPermission(rest_permissions.BasePermission):
         for rule in rules:
             for permission in rule.actions:
                 perm = self._gen_perm(permission.action)
+                if permission.action != view.action:
+                    continue
                 if not user.has_perm(perm):
                     return False
 
@@ -59,6 +61,7 @@ class ModelPermission(rest_permissions.BasePermission):
 
     def has_object_permission(self, request, view, obj):
         user = request.user
+
         rules = [
             rule
             for rule in self.Meta.rules

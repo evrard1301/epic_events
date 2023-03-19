@@ -39,7 +39,8 @@ def change_customer(client, value, sales_employee):
         'phone': value,
         'mobile': value,
         'email': 'dan@email.com',
-        'company': 'DanInc'
+        'company': 'DanInc',
+        'sales_contact': sales_employee.id
     })
 
     assert status.HTTP_200_OK == res.status_code
@@ -56,8 +57,8 @@ def given_a_prospect(name):
 
 
 @when('I add the prospect.')
-def add_prospect(client, management_employee):
-    client.force_login(management_employee)
+def add_prospect(client, sales_employee):
+    client.force_login(sales_employee)
 
     res = client.post(reverse_lazy('crm:customers-list'), {
         'first_name': ctx.name,
@@ -65,7 +66,8 @@ def add_prospect(client, management_employee):
         'email': 'some@email.com',
         'company': 'my company',
         'phone': '000-000-000',
-        'mobile': '000-000-000'
+        'mobile': '000-000-000',
+        'sales_contact': sales_employee.id
     })
 
     ctx.id = res.data['id']

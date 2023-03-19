@@ -5,11 +5,15 @@ import datetime
 
 
 @pytest.fixture
-def contract(db):
+def contract(db, sales_employee2):
     return Contract.objects.create(
         amount=7.2,
         payment_due=timezone.now(),
-        customer=Customer.objects.create(first_name='Conrad', last_name='Crises')
+        customer=Customer.objects.create(
+            first_name='Conrad',
+            last_name='Crises',
+            sales_contact=sales_employee2
+        )
     )
 
 

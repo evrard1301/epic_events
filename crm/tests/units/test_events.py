@@ -8,7 +8,8 @@ def quick_event(contact=None):
         'notes': 'my event',
         'contract': Contract.objects.create(
             amount=7.2,
-            payment_due=timezone.now()
+            payment_due=timezone.now(),
+            customer=Customer.objects.create()
         ),
     }
 
@@ -69,7 +70,9 @@ def test_event_retrieve(client, request, employee_str, own, oracle):
     ('sales_employee', status.HTTP_201_CREATED),
     ('support_employee', status.HTTP_403_FORBIDDEN),
 ])
-def test_event_create(client, request, contract, employee_str, oracle):
+def test_event_create(client, request, contract,
+                      support_employee,
+                      employee_str, oracle):
     my_employee = request.getfixturevalue(employee_str)
     client.force_login(my_employee)
 
@@ -77,7 +80,8 @@ def test_event_create(client, request, contract, employee_str, oracle):
         'attendee': 14,
         'event_date': timezone.now(),
         'notes': 'event notes',
-        'contract': contract.id
+        'contract': contract.id,
+        'support_contact': support_employee.id
     })
 
     assert oracle == res.status_code
@@ -111,7 +115,8 @@ def test_event_update(client, event,
         'attendee': 14,
         'event_date': timezone.now(),
         'notes': 'event notes',
-        'contract': contract.id
+        'contract': contract.id,
+        'support_contact': event.support_contact.id
     })
 
     assert oracle == res.status_code

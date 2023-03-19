@@ -35,7 +35,8 @@ class ModelPermission(rest_permissions.BasePermission):
         rules = [
             rule
             for rule in self.Meta.rules
-            if user.is_in_group(rule.group)
+            if user.is_authenticated
+            and user.is_in_group(rule.group)
         ]
 
         if len(rules) == 0:
@@ -61,7 +62,8 @@ class ModelPermission(rest_permissions.BasePermission):
         rules = [
             rule
             for rule in self.Meta.rules
-            if user.is_in_group(rule.group)
+            if user.is_authenticated
+            and user.is_in_group(rule.group)
         ]
 
         if len(rules) == 0:

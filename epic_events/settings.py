@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 
 from pathlib import Path
 import os
+import sys
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -81,14 +82,22 @@ WSGI_APPLICATION = 'epic_events.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv('OCR_DB_NAME', 'ocr12'),
-        'USER': os.getenv('OCR_DB_USER', 'ocr12'),
-        'PASSWORD': os.getenv('OCR_DB_PASSWORD', 'ocr12')
+if 'pytest' in sys.argv[0]:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': 'test_db.sqlite3'
+        }
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': os.getenv('OCR_DB_NAME', 'ocr12'),
+            'USER': os.getenv('OCR_DB_USER', 'ocr12'),
+            'PASSWORD': os.getenv('OCR_DB_PASSWORD', 'ocr12')
+        }
+    }
 
 
 # Password validation

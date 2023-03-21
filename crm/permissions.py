@@ -19,6 +19,7 @@ class ModelPermission(rest_permissions.BasePermission):
             'retrieve': 'view',
             'create': 'add',
             'update': 'change',
+            'partial_update': 'change',
             'destroy': 'delete',
             'grant': 'grant',
             'sign': 'sign'
@@ -98,7 +99,7 @@ class GroupRule:
         return self.read_only().alter(scope)
 
     def alter(self, scope=None):
-        return self.create(scope).update(scope).destroy(scope)
+        return self.create(scope).update(scope).partial_update(scope).destroy(scope)
 
     def list(self, scope=None):
         self.actions.append(Perm('list', scope))
@@ -114,6 +115,10 @@ class GroupRule:
 
     def update(self, scope=None):
         self.actions.append(Perm('update', scope))
+        return self
+
+    def partial_update(self, scope=None):
+        self.actions.append(Perm('partial_update', scope))
         return self
 
     def destroy(self, scope=None):
@@ -184,6 +189,7 @@ class EventPermission(ModelPermission):
             GroupRule('SupportTeam')
             .read_only()
             .update(support_events)
+            .partial_update(support_events)
             .destroy(support_events)
         ]
 

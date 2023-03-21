@@ -123,6 +123,39 @@ def test_event_update(client, event,
 
 
 @pytest.mark.parametrize('employee_str,own,oracle', [
+    ('management_employee', False, status.HTTP_200_OK),
+    ('sales_employee', False, status.HTTP_403_FORBIDDEN),
+    ('sales_employee', True, status.HTTP_200_OK),
+    ('support_employee', False, status.HTTP_403_FORBIDDEN),
+    ('support_employee', True, status.HTTP_200_OK),
+])
+def test_event_partial_update(client, event,
+                              request, contract,
+                              employee_str, own, oracle):
+    my_employee = request.getfixturevalue(employee_str)
+    client.force_login(my_employee)
+
+    if own:
+        if 'sales' in employee_str:
+            event.contract.customer.sales_contact = my_employee
+            event.contract.customer.save()
+
+        if 'support' in employee_str:
+            event.support_contact = my_employee
+        event.save()
+
+    res = client.patch(reverse_lazy('crm:events-detail', kwargs={
+        'pk': event.id
+    }), {
+        'notes': 'updated !',
+    })
+
+    assert oracle == res.status_code
+    if res.status_code == status.HTTP_200_OK:
+        assert 'updated !' == Event.objects.get(pk=event.id).notes
+
+
+@pytest.mark.parametrize('employee_str,own,oracle', [
     ('management_employee', False, status.HTTP_204_NO_CONTENT),
     ('sales_employee', False, status.HTTP_403_FORBIDDEN),
     ('sales_employee', True, status.HTTP_204_NO_CONTENT),

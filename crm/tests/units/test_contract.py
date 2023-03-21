@@ -147,8 +147,8 @@ def test_contracts_destroy(client, contract,
     ('sales_employee', True, status.HTTP_200_OK),
     ('support_employee', False, status.HTTP_403_FORBIDDEN),
 ])
-def test_contracts_sign(client, contract,
-                        request, employee_str, own, oracle):
+def test_contracts_partial(client, contract,
+                           request, employee_str, own, oracle):
     my_employee = request.getfixturevalue(employee_str)
     client.force_login(my_employee)
 
@@ -156,13 +156,14 @@ def test_contracts_sign(client, contract,
         contract.customer.sales_contact = my_employee
         contract.customer.save()
 
-    res = client.post(reverse_lazy('crm:contracts-sign', kwargs={
+    res = client.patch(reverse_lazy('crm:contracts-detail', kwargs={
         'pk': contract.id
-    }))
+    }), {
+        'amount': 444
+    })
 
     assert oracle == res.status_code
 
     if res.status_code == status.HTTP_200_OK:
         contract.refresh_from_db()
-        assert contract.status is not None
-        assert 'signed' == contract.status.name
+        assert 444 == contract.amount

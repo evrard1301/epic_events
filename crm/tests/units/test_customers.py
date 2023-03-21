@@ -92,6 +92,29 @@ def test_customers_update(client, customer, request, employee_str, oracle):
 
 
 @pytest.mark.parametrize('employee_str,oracle', [
+    ('management_employee', status.HTTP_200_OK),
+    ('sales_employee', status.HTTP_403_FORBIDDEN),
+    ('sales_employee__customer', status.HTTP_200_OK),
+    ('support_employee', status.HTTP_403_FORBIDDEN),
+])
+def test_customers_partial_update(client, customer, request, employee_str, oracle):
+    my_employee = request.getfixturevalue(employee_str)
+    client.force_login(my_employee)
+
+    res = client.patch(reverse_lazy('crm:customers-detail', kwargs={
+        'pk': customer.id
+    }), {
+        'first_name': 'Gaston'
+    })
+
+    assert oracle == res.status_code
+    if oracle == status.HTTP_200_OK:
+        assert 'Gaston' == Customer.objects.get(pk=customer.id).first_name
+
+
+
+
+@pytest.mark.parametrize('employee_str,oracle', [
     ('management_employee', status.HTTP_204_NO_CONTENT),
     ('sales_employee', status.HTTP_403_FORBIDDEN),
     ('sales_employee__customer', status.HTTP_204_NO_CONTENT),

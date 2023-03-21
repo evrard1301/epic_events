@@ -1,4 +1,5 @@
 from fixtures import *
+from django.contrib.auth.hashers import make_password
 
 
 @pytest.mark.parametrize('employee_str,oracle', [
@@ -60,7 +61,9 @@ def test_users_retrieve(client, request, employee_str, oracle):
 def test_users_update(client, request, employee_str, oracle):
     my_employee = request.getfixturevalue(employee_str)
     client.force_login(my_employee)
+
     user = User.objects.create_user(username='benoit', password='benoitpassword')
+
     res = client.put(reverse_lazy('crm:users-detail', kwargs={
         'pk': user.id
     }), {

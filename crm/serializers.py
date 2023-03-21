@@ -5,7 +5,7 @@ from crm.models import (
     Event,
     Contract
 )
-
+from django.contrib.auth.hashers import make_password
 
 class UserSerializer(ModelSerializer):
     class Meta:
@@ -24,6 +24,15 @@ class UserSerializer(ModelSerializer):
 
     def create(self, validated_data):
         return User.objects.create_user(**validated_data)
+
+    def update(self, instance, validated_data):
+        user = super().update(instance, validated_data)
+
+        if 'password' in validated_data.keys():
+            user.set_password(validated_data['password'])
+            user.save()
+
+        return user
 
 
 class CustomerSerializer(ModelSerializer):

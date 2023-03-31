@@ -76,5 +76,5 @@ class ContractViewSet(ModelViewSet):
         )
 
         contract.save()
-
-        return Response()
+        s = ContractSerializer(contract, many=False)
+        return Response(s.data)
